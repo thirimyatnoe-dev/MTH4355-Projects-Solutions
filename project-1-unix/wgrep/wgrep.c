@@ -1,0 +1,35 @@
+#include <stdio.h>
+#include <string.h>
+
+int main(int argc, char *argv[]){
+    if (argc == 1){
+        printf("wgrep: searchterm [file ...]\n");
+        return 1;
+    }
+    char *searchterm = argv[1];
+    char *line = NULL; 
+    size_t len = 0;
+    if (argc == 2){
+        while (getline(&line, &len, stdin) != -1){
+            if (strstr(line, searchterm) != NULL)
+                printf("%s", line);
+        }
+    }
+    else{
+        for (int i = 2; i < argc; i++){
+            FILE *fp = fopen(argv[i], "r");
+            if (fp == NULL){
+                printf("wgrep: cannot open file\n");
+                return 1;
+            }
+            while (getline(&line, &len, fp) != -1){
+            if (strstr(line, searchterm) != NULL)
+                printf("%s", line);
+        }
+        fclose(fp);
+        }
+        
+    }
+   
+    return 0;
+}
