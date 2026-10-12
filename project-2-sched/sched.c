@@ -67,9 +67,9 @@ size_t update_arrivals_and_io(Process *processes, size_t process_count, int time
 }
 
 int is_ready(Process *processes, size_t i, int time) {
-    return processes[i].arrival <= time &&
-           processes[i].blocked_until <= time &&
-           processes[i].cpu_done < processes[i].run_length;
+    return processes[i].arrival <= time && // the process has arrived 
+           processes[i].blocked_until <= time && // not waiting for I/O
+           processes[i].cpu_done < processes[i].run_length; // still has CPU time left
 }
 
 void print_states(Process *processes, size_t process_count, int time, int running) {
@@ -104,10 +104,10 @@ int run_cpu_unit(Process *processes, int running, int time) {
         processes[running].finish_time = time + 1;
         return 1;
     }
-    if (processes[running].io_length > 0 &&
-        processes[running].cpu_done == processes[running].io_time) {
-        processes[running].blocked_until =
-            time + 1 + processes[running].io_length;
+    // Check for i/o
+    if (processes[running].io_length > 0 && // do we have i/o
+        processes[running].cpu_done == processes[running].io_time) { // have we completed the amt of cpu work at which it should request i/o
+        processes[running].blocked_until = time + 1 + processes[running].io_length;
         return 1;
     }
     return 0;
@@ -145,9 +145,8 @@ int run_fifo(Process *processes, size_t process_count) {
         // FIFO: earliest original arrival
         if (running == -1) {
             for (size_t i = 0; i < process_count; i++) {
-                if (is_ready(processes, i, time)) {
-                    if (running == -1 || 
-                        processes[i].arrival < processes[running].arrival) {
+                if (is_ready(processes, i, time)) { 
+                    if (running == -1 || processes[i].arrival < processes[running].arrival) {
                         running = (int)i;
                     }
                 }
@@ -182,8 +181,7 @@ int run_sjf(Process *processes, size_t process_count) {
         if (running == -1) {
             for (size_t i = 0; i < process_count; i++) {
                 if (is_ready(processes, i, time)) {
-                    if (running == -1 || 
-                        processes[i].run_length < processes[running].run_length) {
+                    if (running == -1 || processes[i].run_length < processes[running].run_length) {
                         running = (int)i;
                     }
                 }
@@ -220,7 +218,7 @@ int run_stcf(Process *processes, size_t process_count) {
             if (is_ready(processes, i, time)) {
                 int remaining = processes[i].run_length - processes[i].cpu_done;
                 if (running == -1 ||
-                    remaining < processes[running].run_length - processes[running].cpu_done) {
+                    remaining < processes[running].run_length - processes[running].cpu_done) { // to check if the current process i is better choice than the shortest one we have so far(running)
                     running = (int)i;
                 }
             }
@@ -254,7 +252,7 @@ int run_rr(Process *processes, size_t process_count) {
         // RR: one CPU unit, then look for the next ready process
         running = -1;
         for (size_t checked = 0; checked < process_count; checked++) {
-            size_t i = (next_process + checked) % process_count;
+            size_t i = (next_process + checked) % process_count; // wrapping around
             if (is_ready(processes, i, time)) {
                 running = (int)i;
                 next_process = (i + 1) % process_count;
