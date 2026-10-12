@@ -78,7 +78,7 @@ void print_states(Process *processes, size_t process_count, int time, int runnin
             state = "";
         } else if (processes[i].cpu_done == processes[i].run_length) {
             state = "Dead";
-        } else if (processes[i].blocked_until > time) {
+        } else if (processes[i].blocked_until > time) { 
             state = "Blocked";
         } else if ((int)i == running) {
             state = "Running";
@@ -274,10 +274,10 @@ int run_rr(Process *processes, size_t process_count) {
 }
 
 int main(int argc, char *argv[]) {
-    const char *mode = "FIFO";
+    const char *mode = "FIFO"; // default to FIFO
     int mode_seen = 0;
     int option;
-    opterr = 0;
+    opterr = 0; 
 
     while ((option = getopt(argc, argv, "m:")) != -1) {
         // unknown option, missing mode, or repeated -m
@@ -286,7 +286,7 @@ int main(int argc, char *argv[]) {
             return 1;
         }
         mode = optarg;
-        mode_seen = 1;
+        mode_seen = 1; // to  rmb that -m was used (to avoid overwriting modes)
     }
 
     // extra arguments or unknown policy
@@ -321,7 +321,7 @@ int main(int argc, char *argv[]) {
 
             char *end; // where strtol stopped reading
             errno = 0; // reset before checking for a number that is too large
-            long value = strtol(field, &end, 10);
+            long value = strtol(field, &end, 10); // reads a decimal number (base 10)
 
             // no number found
             if (end == field) {
@@ -369,8 +369,7 @@ int main(int argc, char *argv[]) {
         p.finish_time = -1;
 
         // make room for one more process
-        Process *new_processes = realloc(processes,
-                                         (process_count + 1) * sizeof(Process));
+        Process *new_processes = realloc(processes, (process_count + 1) * sizeof(Process));
         if (new_processes == NULL) {
             fprintf(stderr, "Unable to allocate memory\n");
             free(processes);
