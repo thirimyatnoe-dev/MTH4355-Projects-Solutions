@@ -52,13 +52,11 @@ size_t update_arrivals_and_io(Process *processes, size_t process_count, int time
                 processes[i].blocked_until = time + processes[i].io_length;
                 continue;
             }
-
         }
     }
 
     for (size_t i = 0; i < process_count; i++) {
-        if (processes[i].blocked_until > 0 &&
-            processes[i].blocked_until == time) {
+        if (processes[i].blocked_until > 0 && processes[i].blocked_until == time) {
             processes[i].blocked_until = 0;
         }
     }
