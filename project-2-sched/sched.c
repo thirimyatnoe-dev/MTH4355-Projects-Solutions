@@ -1,5 +1,6 @@
-/* References for the functions used so far:
- * getline: https://man7.org/linux/man-pages/man3/getline.3.html
+/* Name: Thiri Myat Noe
+ * MTH 4355 : Project 2 - Scheduler
+ * References: man7.org, google search for c syntax, p2demo.c
  * strsep: https://man7.org/linux/man-pages/man3/strsep.3.html
  * strtol and ERANGE: https://man7.org/linux/man-pages/man3/strtol.3.html
  * realloc: https://man7.org/linux/man-pages/man3/realloc.3.html
@@ -97,7 +98,6 @@ int run_cpu_unit(Process *processes, int running, int time) {
         processes[running].first_start = time;
     }
     processes[running].cpu_done++;
-
     if (processes[running].cpu_done == processes[running].run_length) {
         processes[running].finish_time = time + 1;
         return 1;
@@ -114,19 +114,16 @@ int run_cpu_unit(Process *processes, int running, int time) {
 void print_averages(Process *processes, size_t process_count) {
     double turnaround_total = 0;
     double response_total = 0;
-
     for (size_t i = 0; i < process_count; i++) {
         turnaround_total += processes[i].finish_time - processes[i].arrival;
         response_total += processes[i].first_start - processes[i].arrival;
     }
-
     double average_turnaround = 0;
     double average_response = 0;
     if (process_count > 0) {
         average_turnaround = turnaround_total / process_count;
         average_response = response_total / process_count;
     }
-
     printf("Average Turn-around Time: %.3f\n", average_turnaround);
     printf("Average Response Time: %.3f\n", average_response);
 }
@@ -139,7 +136,6 @@ int run_fifo(Process *processes, size_t process_count) {
     print_header(process_count);
     while (finished_count < process_count) {
         finished_count += update_arrivals_and_io(processes, process_count, time);
-
         // FIFO: earliest original arrival
         if (running == -1) {
             for (size_t i = 0; i < process_count; i++) {
@@ -174,7 +170,6 @@ int run_sjf(Process *processes, size_t process_count) {
     print_header(process_count);
     while (finished_count < process_count) {
         finished_count += update_arrivals_and_io(processes, process_count, time);
-
         // SJF: shortest total CPU time
         if (running == -1) {
             for (size_t i = 0; i < process_count; i++) {
@@ -209,7 +204,6 @@ int run_stcf(Process *processes, size_t process_count) {
     print_header(process_count);
     while (finished_count < process_count) {
         finished_count += update_arrivals_and_io(processes, process_count, time);
-
         // STCF: reconsider every time unit using remaining CPU work
         running = -1;
         for (size_t i = 0; i < process_count; i++) {
@@ -246,7 +240,6 @@ int run_rr(Process *processes, size_t process_count) {
     print_header(process_count);
     while (finished_count < process_count) {
         finished_count += update_arrivals_and_io(processes, process_count, time);
-
         // RR: one CPU unit, then look for the next ready process
         running = -1;
         for (size_t checked = 0; checked < process_count; checked++) {
@@ -309,7 +302,6 @@ int main(int argc, char *argv[]) {
         int count = 0;
 
         field = strsep(&remaining, ",");
-
         while (field != NULL) {
             // too many fields
             if (count == 4) {
@@ -318,11 +310,9 @@ int main(int argc, char *argv[]) {
                 free(line);
                 return 1;
             }
-
             char *end; // where strtol stopped reading
             errno = 0; // reset before checking for a number that is too large
             long value = strtol(field, &end, 10); // reads a decimal number (base 10)
-
             // no number found
             if (end == field) {
                 printf("Invalid process detected\n");
@@ -330,12 +320,10 @@ int main(int argc, char *argv[]) {
                 free(line);
                 return 1;
             }
-
             // skip whitespace
             while (isspace((unsigned char)*end)) {
                 end++;
             }
-
             // extra text, number too large, or negative number
             if (*end != '\0' || errno == ERANGE ||
                 value < 0 || value > INT_MAX) {
@@ -344,12 +332,10 @@ int main(int argc, char *argv[]) {
                 free(line);
                 return 1;
             }
-
             values[count] = (int)value;
             count++;
             field = strsep(&remaining, ",");
         }
-
         // too few fields
         if (count != 4) {
             printf("Invalid process detected\n");
@@ -367,7 +353,7 @@ int main(int argc, char *argv[]) {
         p.blocked_until = 0;
         p.first_start = -1;
         p.finish_time = -1;
-
+        
         // make room for one more process
         Process *new_processes = realloc(processes, (process_count + 1) * sizeof(Process));
         if (new_processes == NULL) {
@@ -376,12 +362,10 @@ int main(int argc, char *argv[]) {
             free(line);
             return 1;
         }
-
         processes = new_processes;
         processes[process_count] = p;
         process_count++;
     }
-
     if (ferror(stdin)) {
         fprintf(stderr, "Unable to read input\n");
         free(processes);
