@@ -47,7 +47,6 @@ size_t update_arrivals_and_io(Process *processes, size_t process_count, int time
                 finished_count++;
                 continue;
             }
-
             // I/O before any CPU work
             if (processes[i].io_time == 0 && processes[i].io_length > 0) {
                 processes[i].blocked_until = time + processes[i].io_length;
@@ -61,7 +60,6 @@ size_t update_arrivals_and_io(Process *processes, size_t process_count, int time
             processes[i].blocked_until = 0;
         }
     }
-
     return finished_count;
 }
 
@@ -146,7 +144,6 @@ int run_fifo(Process *processes, size_t process_count) {
                 }
             }
         }
-
         print_states(processes, process_count, time, running);
         if (running != -1 && run_cpu_unit(processes, running, time) == 1) {
             if (processes[running].cpu_done == processes[running].run_length) {
@@ -215,7 +212,6 @@ int run_stcf(Process *processes, size_t process_count) {
                 }
             }
         }
-
         print_states(processes, process_count, time, running);
         if (running != -1 && run_cpu_unit(processes, running, time) == 1) {
             if (processes[running].cpu_done == processes[running].run_length) {
@@ -250,7 +246,6 @@ int run_rr(Process *processes, size_t process_count) {
                 break;
             }
         }
-
         print_states(processes, process_count, time, running);
         if (running != -1 && run_cpu_unit(processes, running, time) == 1) {
             if (processes[running].cpu_done == processes[running].run_length) {
@@ -281,7 +276,6 @@ int main(int argc, char *argv[]) {
         mode = optarg;
         mode_seen = 1; // to  rmb that -m was used (to avoid overwriting modes)
     }
-
     // extra arguments or unknown policy
     if (optind != argc ||
         (strcmp(mode, "FIFO") != 0 && strcmp(mode, "SJF") != 0 &&
@@ -294,13 +288,11 @@ int main(int argc, char *argv[]) {
     size_t capacity = 0;
     Process *processes = NULL;
     size_t process_count = 0;
-
     while (getline(&line, &capacity, stdin) != -1) {
         char *remaining = line;
         char *field;
         int values[4];
         int count = 0;
-
         field = strsep(&remaining, ",");
         while (field != NULL) {
             // too many fields
@@ -352,8 +344,7 @@ int main(int argc, char *argv[]) {
         p.cpu_done = 0;
         p.blocked_until = 0;
         p.first_start = -1;
-        p.finish_time = -1;
-        
+        p.finish_time = -1;        
         // make room for one more process
         Process *new_processes = realloc(processes, (process_count + 1) * sizeof(Process));
         if (new_processes == NULL) {
