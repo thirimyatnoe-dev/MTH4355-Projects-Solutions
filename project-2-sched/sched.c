@@ -1,6 +1,6 @@
 /* Name: Thiri Myat Noe
  * MTH 4355 : Project 2 - Scheduler
- * References: man7.org, google search for c syntax, p2demo.c
+ * References: man7.org, google search, p2demo.c
  * strsep: https://man7.org/linux/man-pages/man3/strsep.3.html
  * strtol and ERANGE: https://man7.org/linux/man-pages/man3/strtol.3.html
  * realloc: https://man7.org/linux/man-pages/man3/realloc.3.html
